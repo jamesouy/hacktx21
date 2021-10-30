@@ -21,10 +21,12 @@ const toneParams = {
   contentType: 'application/json',
 };
 
-toneAnalyzer.tone(toneParams)
-  .then(toneAnalysis => {
-    console.log(JSON.stringify(toneAnalysis, null, 2));
-  })
-  .catch(err => {
-    console.log('error:', err);
-  });
+// toneAnalyzer.tone(toneParams)
+//   .then(toneAnalysis => {
+//     console.log(JSON.stringify(toneAnalysis, null, 2));
+//   })
+//   .catch(err => {
+//     console.log('error:', err);
+//   });
+  
+export {toneAnalyzer};

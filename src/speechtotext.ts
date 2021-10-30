@@ -1,22 +1,37 @@
-var userToFile = new Map;
+// Imports the Google Cloud client library
+const speech = require('@google-cloud/speech');
 const fs = require('fs');
 
-function transcribeUser(_channelId) {
-  console.log(`Sliding into ${_channelId.name} ...`);
-  _channelId.join().then(conn => {
-    const dispatcher = conn;
-    dispatcher.on('finish', () => { console.log(`Joined ${_channelId.name}!\n\nREADY TO RECORD\n`); });
+// Creates a client
+const speechClient = new speech.SpeechClient();
 
-    const receiver = conn.receiver;
-    conn.on('speaking', (user, speaking) => {
-      if (speaking) {
-        console.log(`${user.username} started speaking`);
-        const audioStream = receiver.createStream(user, { mode: 'mp3' });
-        
-        audioStream.on('end', () => { console.log(`${user.username} stopped speaking`); });
-      }
-    });
-  })
-    .catch(err => { throw err; });
-  
+const encoding = 'Encoding of the audio file, e.g. LINEAR16';
+const sampleRateHertz = 16000;
+const languageCode = 'BCP-47 language code, e.g. en-US';
+
+const config = {
+  encoding: encoding,
+  sampleRateHertz: sampleRateHertz,
+  languageCode: languageCode,
+};
+function transcribe(file) {
+  const audio = {
+    content: file.toString('base64'),
+  };
+
+  const request = {
+    config: config,
+    audio: audio,
+  };
+
+  // Detects speech in the audio file. This creates a recognition job that you
+  // can wait for now, or get its result later.
+  const [operation] = await client.longRunningRecognize(request);
+
+  // Get a Promise representation of the final result of the job
+  const [response] = await operation.promise();
+  const transcription = response.results
+    .map(result => result.alternatives[0].transcript)
+    .join('\n');
+  return transcription;
 }

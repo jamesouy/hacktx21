@@ -1,7 +1,6 @@
 // import { privateEncrypt } from "crypto";
 
 // // Require the necessary discord.js classes
-const 
 const { Client, Intents } = require('discord.js');
 const { joinVoiceChannel } = require('@discordjs/voice');
 
@@ -73,7 +72,9 @@ client.on('message', (msg) => {
 		toneAnalyzer.tone(toneParams)
 			.then(toneAnalysis => {
 				msg.reply(JSON.stringify(toneAnalysis.result, null, 2));
-				toneAnalysis.result.document_tone.tones.forEach(tone => { })
+				toneAnalysis.result.document_tone.tones.forEach(tone => {
+					
+				})
 			})
 			.catch(err => {
 				console.log('error:', err);

@@ -5,7 +5,7 @@ const { Client, Intents } = require('discord.js');
 const { joinVoiceChannel } = require('@discordjs/voice');
 const Discord = require('discord.js');
 require('dotenv').config();
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
 client.login(process.env.BOT_TOKEN);
 
 client.on('ready', () => console.log('The Bot is ready!'));

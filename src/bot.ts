@@ -11,3 +11,7 @@ client.once('ready', () => {
 
 // Login to Discord with your client's token
 client.login("OTA0MDkwMzkyODI2MzU1NzUz.YX2dyg.zscL-pr4VzxHjC2vW75K_ZO5eZE");
+
+client.on('message', (msg : any) => {
+	if (msg.content === '?set') msg.reply('Hi');
+});

@@ -1,12 +1,7 @@
 var userToFile = new Map;
 const fs = require('fs');
 
-const createNewChunk = () => {
-  const pathToFile = __dirname + `/../recordings/${Date.now()}.pcm`;
-  return fs.createWriteStream(pathToFile);
-};
-
-function transcribeUser(_id, _channelId) {
+function transcribeUser(_channelId) {
   console.log(`Sliding into ${_channelId.name} ...`);
   _channelId.join().then(conn => {
     const dispatcher = conn;
@@ -16,8 +11,8 @@ function transcribeUser(_id, _channelId) {
     conn.on('speaking', (user, speaking) => {
       if (speaking) {
         console.log(`${user.username} started speaking`);
-        const audioStream = receiver.createStream(user, { mode: 'pcm' });
-        audioStream.pipe(createNewChunk());
+        const audioStream = receiver.createStream(user, { mode: 'mp3' });
+        
         audioStream.on('end', () => { console.log(`${user.username} stopped speaking`); });
       }
     });

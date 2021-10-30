@@ -62,13 +62,13 @@ client.on('message', (msg) => {
 		};
 		toneAnalyzer.tone(toneParams)
 			.then(toneAnalysis => {
-				msg.reply(JSON.stringify(toneAnalysis, null, 2));
+				msg.reply(JSON.stringify(toneAnalysis.result, null, 2));
 			})
 			.catch(err => {
 				console.log('error:', err);
 			});
 	} else if (params[0] === '?record'){
-		console.log(msg.author.voice.channelID);
+		console.log(msg.member);
 		// const connection = joinVoiceChannel({
 		// 	channelId: msg.author.voice.channelID,
 		// 	guildId: channel.guild.id,

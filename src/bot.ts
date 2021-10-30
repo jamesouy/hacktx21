@@ -83,9 +83,11 @@ client.on('message', (msg) => {
 			msg.reply('Please join a voice channel first!');
 		} else {
 			try {
-				const connection = await connectToChannel(voieChannel);
-				connection.subscribe(player);
-				message.reply('Playing now!');
+				const connection = joinVoiceChannel({
+					channelId: voiceChannel,
+					guildId: msg.guildId,
+					adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+				});
 			} catch (error) {
 				console.error(error);
 			}

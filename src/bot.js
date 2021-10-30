@@ -1,12 +1,21 @@
 // import { privateEncrypt } from "crypto";
 
 // // Require the necessary discord.js classes
+const fs = require('fs');
 const { Client, Intents } = require('discord.js');
 const { joinVoiceChannel } = require('@discordjs/voice');
-
 require('dotenv').config();
+
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 client.login(process.env.BOT_TOKEN);
+
+// Initializing commands
+client.commands = new Discord.Collection();
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	client.commands.set(command.name, command);
+}
 
 client.on('ready', () => console.log('The Bot is ready!'));
 

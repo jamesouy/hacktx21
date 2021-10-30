@@ -1,9 +1,10 @@
 // import { privateEncrypt } from "crypto";
 
 // // Require the necessary discord.js classes
+const 
 const { Client, Intents } = require('discord.js');
 const { joinVoiceChannel } = require('@discordjs/voice');
-const Discord = require('discord.js');
+
 require('dotenv').config();
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 client.login(process.env.BOT_TOKEN);
@@ -27,15 +28,14 @@ const toneAnalyzer = new ToneAnalyzerV3({
 var angerThreshold = 0.6;
 var joyThreshold = 0.6;
 const thresholdRange = [0, 1];
-var listening=false;
 
-function commandListen(message){
+function commandListen(message) {
 	var member = message.member;
 	if (!member) {
 		return;
 	}
 	if (!member.voiceChannel) {
-		message.reply(" you need to be in a voice channel first.")
+		message.reply(" you need to be in a voice channel first.");
 		return;
 	}
 	if (listening) {
@@ -73,24 +73,21 @@ client.on('message', (msg) => {
 		toneAnalyzer.tone(toneParams)
 			.then(toneAnalysis => {
 				msg.reply(JSON.stringify(toneAnalysis.result, null, 2));
+				toneAnalysis.result.document_tone.tones.forEach(tone => { })
 			})
 			.catch(err => {
 				console.log('error:', err);
 			});
-	} else if (params[0] === '?record'){
+	} else if (params[0] === '?record') {
 		var voiceChannel = msg.member.voice.channel.id;
 		if (!voiceChannel) {
 			msg.reply('Please join a voice channel first!');
 		} else {
-			try {
-				const connection = await connectToChannel(voieChannel);
-				connection.subscribe(player);
-				message.reply('Playing now!');
-			} catch (error) {
-				console.error(error);
-			}
+			client.channels.get(voiceChannel).join();
 		}
 	} else if (params[0] === '?transcribe') {
 		
+	} else if (params[0]==='?start'){
+		commandListen(msg);
 	}
 });

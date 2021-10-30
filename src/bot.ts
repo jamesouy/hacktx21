@@ -1,52 +1,30 @@
+// import { privateEncrypt } from "crypto";
+
 // // Require the necessary discord.js classes
-// const { Client, Intents } = require('discord.js');
-
-// // Create a new client instance
-// const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
-
-// // When the client is ready, run this code (only once)
-// client.once('ready', () => {
-// 	console.log('Ready!');
-// });
-
-// // Login to Discord with your client's token
-// client.login("OTA0MDkwMzkyODI2MzU1NzUz.YX2dyg.zscL-pr4VzxHjC2vW75K_ZO5eZE");
-
-// client.on('message', (msg : any) => {
-// 	if (msg.content === '?set') msg.reply('Hi');
-// });
-
+const { Client, Intents } = require('discord.js');
 const Discord = require('discord.js');
 require('dotenv').config();
-
-const client = new Discord.Client();
-
-client.login("OTA0MDkwMzkyODI2MzU1NzUz.YX2dyg.zscL-pr4VzxHjC2vW75K_ZO5eZE");
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+client.login(process.env.BOT_TOKEN);
 
 client.on('ready', () => console.log('The Bot is ready!'));
 
-// Adding jokes function
+var angerThreshold = 0.4;
+const thresholdRange = [0, 1];
 
-// Jokes from dcslsoftware.com/20-one-liners-only-software-developers-understand/
-// www.journaldev.com/240/my-25-favorite-programming-quotes-that-are-funny-too
-const jokes = [
-	'I went to a street where the houses were numbered 8k, 16k, 32k, 64k, 128k, 256k and 512k. It was a trip down Memory Lane.',
-	'“Debugging” is like being the detective in a crime drama where you are also the murderer.',
-	'The best thing about a Boolean is that even if you are wrong, you are only off by a bit.',
-	'A programmer puts two glasses on his bedside table before going to sleep. A full one, in case he gets thirsty, and an empty one, in case he doesn’t.',
-	'If you listen to a UNIX shell, can you hear the C?',
-	'Why do Java programmers have to wear glasses? Because they don’t C#.',
-	'What sits on your shoulder and says “Pieces of 7! Pieces of 7!”? A Parroty Error.',
-	'When Apple employees die, does their life HTML5 in front of their eyes?',
-	'Without requirements or design, programming is the art of adding bugs to an empty text file.',
-	'Before software can be reusable it first has to be usable.',
-	'The best method for accelerating a computer is the one that boosts it by 9.8 m/s2.',
-	'I think Microsoft named .Net so it wouldn’t show up in a Unix directory listing.',
-	'There are two ways to write error-free programs; only the third one works.',
-];
-
-client.on('message', (msg : any) => {
-	if (msg.content === '?joke') {
-		msg.channel.send(jokes[Math.floor(Math.random() * jokes.length)]);
+client.on('message', (msg) => {
+	var params = msg.content.split(" ");
+	if (params[0] === '?threshold') {
+		if(isNaN(parseFloat(params[1]))){
+			msg.channel.send("Cannot convert to a number");
+		} else if (parseFloat(params[1]) < thresholdRange[0] || parseFloat(params[1]) > thresholdRange[1]) {
+			msg.channel.send("Threshold should be between " + thresholdRange[0] + " and " + thresholdRange[1]);
+		} else {
+			angerThreshold = parseFloat(params[1]);
+			msg.channel.send("Successfully set the anger threshold to " + angerThreshold);
+		}
+	}
+	if(params[0] === '?printThreshold'){
+		msg.channel.send('The current anger threshold is ' + angerThreshold);
 	}
 });

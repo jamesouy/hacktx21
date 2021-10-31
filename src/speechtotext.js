@@ -5,29 +5,28 @@ const fs = require('fs');
 // Creates a client
 const speechClient = new speech.SpeechClient();
 
-const encoding = 'Encoding of the audio file, e.g. LINEAR16';
+const encoding = 'MP3';
 const sampleRateHertz = 16000;
-const languageCode = 'BCP-47 language code, e.g. en-US';
+const languageCode = 'en-US';
 
-const config = {
-  encoding: encoding,
-  sampleRateHertz: sampleRateHertz,
-  languageCode: languageCode,
-};
-function transcribe(file) {
+async function transcribe(file) {
   const audio = {
     content: file.toString('base64'),
   };
 
+  const config = {
+    encoding: 'MP3',
+    sampleRateHertz: 16000,
+    languageCode: 'en-US',
+  };
   const request = {
-    config: config,
     audio: audio,
+    config: config,
   };
 
   // Detects speech in the audio file. This creates a recognition job that you
   // can wait for now, or get its result later.
-  const [operation] = await client.longRunningRecognize(request);
-
+  const [operation] = await speechClient.longRunningRecognize(request);
   // Get a Promise representation of the final result of the job
   const [response] = await operation.promise();
   const transcription = response.results
@@ -35,3 +34,5 @@ function transcribe(file) {
     .join('\n');
   return transcription;
 }
+
+exports.transcriber = transcribe;

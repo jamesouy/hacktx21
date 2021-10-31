@@ -16,10 +16,10 @@ const text = "Google, headquartered in Mountain View (1600 Amphitheatre Pkwy, Mo
 //   + 'quarters. We have a competitive product, but we '
 //   + 'need to do a better job of selling it!';
 
-const toneParams = {
-  toneInput: { 'text': text },
-  contentType: 'application/json',
-};
+// const toneParams = {
+//   toneInput: { 'text': text },
+//   contentType: 'application/json',
+// };
 
 // toneAnalyzer.tone(toneParams)
 //   .then(toneAnalysis => {
@@ -29,4 +29,4 @@ const toneParams = {
 //     console.log('error:', err);
 //   });
   
-export {toneAnalyzer};
+exports.toneAnalyzer = toneAnalyzer;

@@ -1,12 +1,13 @@
 // import { privateEncrypt } from "crypto";
 
 // // Require the necessary discord.js classes
+import {createWriteStream} from 'node:fs';
+import prism from 'prism-media';
 const fs = require('fs');
-const {Client, Intents} = require('discord.js-v12');
+const {Client, Intents} = require('discord.js');
 // const {createDiscordJSAdapter} = require './adapter';
-const Discord = require('discord.js-v12');
-const {joinVoiceChannel} = require('@discordjs/voice');
-const {OpusEncoder} = require('@discordjs/opus');
+const Discord = require('discord.js');
+const {joinVoiceChannel, VoiceReceiver, EndBehaviorType} = require('@discordjs/voice');
 const {Readable} = require('stream');
 require('dotenv').config();
 
@@ -59,14 +60,15 @@ client.on('message', (msg) => {
     if (!msg.member.voice.channel) {
       msg.reply('Please join a voice channel first!');
     } else {
-      const fs = require('fs');
+      const connection = joinVoiceChannel({
+        channelId: msg.member.voice.channel.id,
+        guildId: msg.guild.id,
+        adapterCreator: msg.guild.voiceAdapterCreator,
+        selfDeaf: false,
+      });
 
-      // Create a ReadableStream of s16le PCM audio
-      const audio = connection.receiver.createStream(user, {mode: 'pcm'});
-
-      audio.pipe(fs.createWriteStream('user_audio'));
-      
-      
+      const audioStream = connection.receiver;
+      createListeningStream(audioStream, msg.member.id);
     }
   }
 
@@ -76,6 +78,38 @@ client.on('message', (msg) => {
   if (!msg.content.startsWith("?")) return;
   args = msg.content.slice(1).trim().split(/\s+/);
 
-
-
 });
+
+
+function createListeningStream(receiver, userId) {
+  const opusStream = receiver.subscribe(userId, {
+    end: {
+      behavior: EndBehaviorType.AfterSilence,
+      duration: 100,
+    },
+  });
+
+  const oggStream = new prism.opus.OggLogicalBitstream({
+    opusHead: new prism.opus.OpusHead({
+      channelCount: 2,
+      sampleRate: 48000,
+    }),
+    pageSizeControl: {
+      maxPackets: 10,
+    },
+  });
+
+  const filename = `./recordings/${Date.now()}.ogg`;
+
+  const out = createWriteStream(filename);
+
+  console.log(`👂 Started recording ${filename}`);
+
+  pipeline(opusStream, oggStream, out, (err) => {
+    if (err) {
+      console.warn(`❌ Error recording file ${filename} - ${err.message}`);
+    } else {
+      console.log(`✅ Recorded ${filename}`);
+    }
+  });
+}

@@ -18,7 +18,7 @@ for (const file of commandFiles) {
 
 client.once('ready', () => console.log('The Bot is ready!'));
 
-client.on('message', (msg) => {
+client.on('message', async (msg) => {
 
 	if (!msg.content.startsWith("?")) return;
 	args = msg.content.slice(1).trim().split(/\s+/);

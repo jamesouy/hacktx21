@@ -28,11 +28,10 @@ client.on('messageCreate', async (msg) => {
 			try {
 				command.execute(msg, args.slice(1));
 			} catch (err) {
-				msg.channel.send(
-					new Discord.MessageEmbed()
-						.setTitle('OOF!')
-						.setDescription('Error occured lol ur so bad at coding')
-				);
+				msg.channel.send({ embeds: [{
+					title: 'OOF!',
+					description: 'Error occured lol ur so bad at coding',
+				}]});
 				console.error(err);
 			}
 			break;

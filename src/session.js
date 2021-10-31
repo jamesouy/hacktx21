@@ -10,6 +10,9 @@ var isRecording = false
 var connection;
 var leave;
 
+const gifs = ['gifs/gif1.gif', 'gifs/gif2.gif', 'gifs/gif3.gif', 'gifs/gif4.gif',
+'gifs/gif5.gif', 'gifs/gif6.gif'];
+
 function recordUser(connection, id, channel){
   const filename = './recordings/r'+id+'.ogg';
 
@@ -105,15 +108,21 @@ function transcribe(channel, filename, id) {
 							if (tone.score >= threshold) {
 								reply += "\nYour emotion is "+tone.tone_name+".";
 								if(tone.tone_id == 'anger') {
+									var f = gifs[Math.floor(Math.random() * gifs.length)];
 										channel.send({ embeds: [{
 											title: 'Warning',
-											description: `<!@${id}>, please calm down. Anger is not allowed on voice chats. Next time you will be muted.`,
-										}]}).catch(console.error)
+											description: `${msg.member}, we've detected that you're feeling angry. Here's a gif to cheer you up!`,
+										}],
+										files: [`${f}`]
+									})
 								}
 							}
 						});
-						channel.send("Results: "+channel.guild.members.cache.get(id).toString() + " " + result+"\n"+reply)
-						.catch(console.error)
+						if(args.length < 2){
+							msg.reply(result + "\n" + reply);
+						} else {
+							msg.channel.send(msg.guild.members.cache.get(args[1]).toString() + " " + result+"\n"+reply);
+						}
 					})
 			}
 		}).catch(err => console.error(err));

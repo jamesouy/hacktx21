@@ -27,13 +27,22 @@ module.exports = {
                   reply += "\nYou sound joyous.";
                 }
               });
-              msg.reply(result+"\n"+reply);
+              if(args.length < 2){
+                msg.reply(result + "\n" + reply);
+              } else {
+                
+                msg.channel.send(msg.guild.members.cache.get(args[1]).toString() + " " + result+"\n"+reply);
+              }
             })
         }        
         //msg.reply("James Bot: " + reply);
       }).catch(err => msg.reply(err));
     } catch {
-      msg.reply("Linus Bot: file not found");
+      if(args.length < 2){
+        msg.reply("File not found");
+      } else {
+        msg.channel.send(msg.guild.members.cache.get(args[1]).toString() + " File not found");
+      }
     }
     //   var file = fs.readFileSync(args[0] || 'recording.ogg');
     //   transcriber(file)

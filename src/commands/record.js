@@ -13,10 +13,10 @@ const SILENCE_FRAME = Buffer.from([0xF8, 0xFF, 0xFE]);
 
 function recordUser(connection, id, msg){
   const opusStream = connection.receiver.subscribe(id, {
-    end: {
-      behavior: EndBehaviorType.AfterSilence,
-      duration: 2000,
-    },
+      end: {
+        behavior: EndBehaviorType.AfterSilence,
+        duration: 2000,
+      },
     });
   
     const oggStream = new opus.OggLogicalBitstream({
@@ -70,6 +70,7 @@ module.exports = {
 
       for(var i in ids){
         console.log(ids[i]);
+        
         recordUser(connection, ids[i], msg);
       }
 

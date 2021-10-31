@@ -11,12 +11,11 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 client.login(process.env.BOT_TOKEN);
 
 // Initializing slash commands
-const commands = [
-	new SlashCommandBuilder().setName('join').setDescription('Join your current channel'),
-	new SlashCommandBuilder().setName('leave').setDescription('Leave the voice channel'),
-	new SlashCommandBuilder().setName('autojoin').setDescription('Set whether the bot automatically joins channels'),
-].map(command => command.toJSON())
-const rest = new REST({ version: '9' }).setToken(process.env.BOT_TOKEN);
+client.slashCommands = new Discord.Collection();
+for (const file of fs.readdirSync('./src/slash-commands').filter(file => file.endsWith('.js'))) {
+	const command = require(`./slash-commands/${file}`);
+	client.slashCommands.set(command.data.name, command);
+}
 
 // Initializing testing commands
 client.commands = new Discord.Collection();
@@ -26,9 +25,23 @@ for (const file of commandFiles) {
 	client.commands.set(command.name, command);
 }
 
-client.once('ready', () => {
-	console.log('The Bot is ready!')
-});
+client.once('ready', () => console.log('The Bot is ready!'));
+
+client.on('interactionCreate', async interaction => {
+	if (!interaction.isCommand()) return;
+	const command = client.slashCommands.get(interaction.commandName);
+	if (!command) return;
+
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(err);
+		await msg.channel.send({ embeds: [{
+			title: 'OOF!',
+			description: 'Error occured lol ur so bad at coding',
+		}]});
+	}
+})
 
 client.on('messageCreate', async (msg) => {
 

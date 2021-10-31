@@ -2,8 +2,8 @@ const {SlashCommandBuilder} = require('@discordjs/builders')
 const fs = require('fs');
 const {transcriber} = require('../speechtotext');
 const {toneAnalyzer} = require('../analyzer');
-const {angerThreshold} = require('./threshold');
-const warn = require('./warn');
+const {threshold} = require('./threshold');
+const warn = require('../slash-commands/warn');
 
 
 module.exports = {
@@ -24,9 +24,15 @@ module.exports = {
             .then(toneAnalysis => {
               let reply = JSON.stringify(toneAnalysis.result, null, 2);
               toneAnalysis.result.document_tone.tones.forEach(tone => {
-                if (tone.score >= angerThreshold) {
-                  reply += "\nYou sound "+tone.tone_name+".";
-                  if(tone.tone_id == 'angry') warn.execute(msg);
+                console.log(tone);
+                if (tone.score >= threshold) {
+                  reply += "\nYour emotion is "+tone.tone_name+".";
+                  if(tone.tone_id == 'anger') {
+                      msg.reply({ embeds: [{
+                        title: 'Warning',
+                        description: `${msg.member}, please calm down. Anger is not allowed on voice chats. Next time you will be muted.`,
+                      }]})
+                  }
                 }
               });
               if(args.length < 2){

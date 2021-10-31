@@ -34,9 +34,9 @@ client.on('interactionCreate', async interaction => {
 
 	try {
 		await command.execute(interaction);
-	} catch (error) {
+	} catch (err) {
 		console.error(err);
-		await msg.channel.send({ embeds: [{
+		await interaction.reply({ embeds: [{
 			title: 'OOF!',
 			description: 'Error occured lol ur so bad at coding',
 		}]});

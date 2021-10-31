@@ -4,8 +4,8 @@
   "description": "Discord bot that mutes ppl with emotion",
   "main": "./lib/index.js",
   "scripts": {
-    "test": "node src/bot",
-    "lint": "tslint -c tslint.json src/**/*.ts"
+    "run": "node src/bot",
+    "deploy": "node src/deploy-commands"
   },
   "author": "",
   "license": "ISC",

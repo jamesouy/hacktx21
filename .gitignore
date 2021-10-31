@@ -3,3 +3,5 @@ node_modules
 .env
 *.ogg
 .DS_Store
+package-lock.json
+pacific-apex-330619-9213e81558d6.json

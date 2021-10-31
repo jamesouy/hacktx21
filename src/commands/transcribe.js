@@ -6,7 +6,7 @@ module.exports = {
   name: 'transcribe',
   execute(msg, args) {
     try {
-      var file = fs.readFileSync(args[0]);
+      var file = fs.readFileSync(args[0] || 'recording.ogg');
       transcriber(file)
       .then(result => {
         let reply = result;

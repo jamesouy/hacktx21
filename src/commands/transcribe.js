@@ -39,11 +39,11 @@ module.exports = {
                   }
                 }
               });
-              if(args.length < 2){
-                msg.reply(result + "\n" + reply);
-              } else {
-                msg.channel.send(msg.guild.members.cache.get(args[1]).toString() + " " + result+"\n"+reply);
-              }
+              // if(args.length < 2){
+              //   msg.reply(result + "\n" + reply);
+              // } else {
+              //   msg.channel.send(msg.guild.members.cache.get(args[1]).toString() + " " + result+"\n"+reply);
+              // }
             })
         }        
         //msg.reply("James Bot: " + reply);

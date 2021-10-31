@@ -7,7 +7,6 @@ const {opus} = require('prism-media');
 const {pipeline} = require('stream');
 
 var isRecording = false
-var timer;
 var connection;
 var leave;
 
@@ -75,12 +74,15 @@ function startSession(voiceChannel, msgChannel) {
 			recordUser(connection, ids[i], msgChannel);
 		}
 	} 
+
+	leave = setTimeout(() => session.stopSession(), 3600000);
 }
 
 function stopSession() {
 	if (!isRecording) return
 	isRecording = false;
 	connection.destroy();
+	clearTimeout(leave);
 }
 
 function transcribe(channel, filename, id) {
@@ -106,16 +108,18 @@ function transcribe(channel, filename, id) {
 										channel.send({ embeds: [{
 											title: 'Warning',
 											description: `<!@${id}>, please calm down. Anger is not allowed on voice chats. Next time you will be muted.`,
-										}]})
+										}]}).catch(console.error)
 								}
 							}
 						});
-						channel.send(channel.guild.members.cache.get(id).toString() + " " + result+"\n"+reply);
+						channel.send("Results: "+channel.guild.members.cache.get(id).toString() + " " + result+"\n"+reply)
+						.catch(console.error)
 					})
 			}
-		}).catch(err => channel.send(err));
+		}).catch(err => console.error(err));
 	} catch {
-		channel.send(channel.guild.members.cache.get(id).toString() + " File not found");
+		channel.send(channel.guild.members.cache.get(id).toString() + " File not found")
+		.catch(console.error)
 	}
 }
 

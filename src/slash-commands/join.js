@@ -15,7 +15,6 @@ module.exports = {
 				return
 		}
 		session.startSession(interaction.member.voice.channel, interaction.channel);
-		leave = setTimeout(() => session.stopSession(), 3600000);
 		await interaction.reply("Joined channel!")
 	},
 }

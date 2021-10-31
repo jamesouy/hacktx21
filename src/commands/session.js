@@ -16,72 +16,91 @@ class Silence extends Readable {
   }
 }
 const transcribe = require(`./transcribe`);
+const { Client } = require('discord.js');
 const filename = `../recording.ogg`;
 
 var recording = false;
 var timer;
 var connection;
+var leave;
 
-function record(connection, msg) {
+function recordUser(connection, id, msg){
+  const filename = './recordings/r'+id+'.ogg';
+
   if(!fs.existsSync(`${filename}`)) {
-    console.log("RECORDING:");
-    const opusStream = connection.receiver.subscribe(msg.member.id, {
+    const opusStream = connection.receiver.subscribe(id, {
         end: {
         behavior: EndBehaviorType.AfterSilence,
-        duration: 500,
+        duration: 1000,
         },
     });
     
     const oggStream = new opus.OggLogicalBitstream({
         opusHead: new opus.OpusHead({
-        channelCount: 2,
-        sampleRate: 48000,
+          channelCount: 2,
+          sampleRate: 48000,
         }),
         opusTags: new opus.OpusTags({
-        maxPackets: 10,
+          maxPackets: 10,
         }),
     });
     
     const out = fs.createWriteStream(filename);
     
     pipeline(opusStream, oggStream, out, (err) => {
-        if (err) {
-          console.warn(`❌ Error recording file ${filename} - ${err.message}`);
-        } else {
-          console.log(`✅ Recorded ${filename}`);
-          transcribe.execute(msg, [`${filename}`]);
-          fs.unlinkSync(`${filename}`);
-          record(connection, msg); // recursive call to keep tracking
-        }
+      if (err) {
+        console.warn(`❌ Error recording file ${filename} - ${err.message}`);
+      } else {
+        console.log(`✅ Recorded ${filename}`);
+        transcribe.execute(msg, [filename, id]);
+        fs.unlinkSync(`${filename}`);
+        recordUser(connection, id, msg); // recursive call to keep tracking
+      }
     });
+
+    setTimeout(()=>{
+      console.log("Stream closed");
+      opusStream.push(null);
+      // opusStream.unpipe(oggStream);
+      // opusStream.emit('close');
+      opusStream.destroy();
+    }, 5_000);
   }
 }
 
 module.exports = {
   name: 'session',
   async execute(msg, args) {
-      if(recording){
-        recording = false;
-        connection.destroy();
+    if(recording){
+      recording = false;
+      connection.destroy();
+      clearTimeout(leave);
+    } else {
+      if (!msg.member.voice.channel) {
+          msg.reply('Please join a voice channel first!');
       } else {
-        if (!msg.member.voice.channel) {
-            msg.reply('Please join a voice channel first!');
-        } else {
-          recording = true;
+        recording = true;
 
-          if(fs.existsSync(`${filename}`)){
-            fs.unlinkSync(`${filename}`);
+        connection = joinVoiceChannel({
+            channelId: msg.member.voice.channel.id,
+            guildId: msg.channel.guild.id,
+            adapterCreator: msg.channel.guild.voiceAdapterCreator,
+            selfDeaf: false,
+        });
+
+        const ids = Array.from(msg.member.voice.channel.members.keys());
+        for(var i in ids){
+          if(ids[i] != 904103150758293514){ // Bot ID
+            const filename = './recordings/r'+ids[i]+'.ogg';
+            if(fs.existsSync(`${filename}`)){
+              fs.unlinkSync(`${filename}`);
+            }
+            recordUser(connection, ids[i], msg);
           }
+        } 
 
-          connection = joinVoiceChannel({
-              channelId: msg.member.voice.channel.id,
-              guildId: msg.channel.guild.id,
-              adapterCreator: msg.channel.guild.voiceAdapterCreator,
-              selfDeaf: false,
-          });
-
-          record(connection, msg);
-        }
+        leave = setTimeout(() => execute(msg, args), 3600000);
+      }
     }
   }
 };

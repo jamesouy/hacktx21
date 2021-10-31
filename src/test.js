@@ -2,10 +2,11 @@
 
 // // Require the necessary discord.js classes
 const fs = require('fs');
-const {Client, Intents} = require('discord.js');
+const {Client, Intents} = require('discord.js-v12');
 // const {createDiscordJSAdapter} = require './adapter';
-const Discord = require('discord.js');
+const Discord = require('discord.js-v12');
 const {joinVoiceChannel} = require('@discordjs/voice');
+const {OpusEncoder} = require('@discordjs/opus');
 const {Readable} = require('stream');
 require('dotenv').config();
 
@@ -15,7 +16,7 @@ client.login(process.env.BOT_TOKEN);
 const SILENCE_FRAME = Buffer.from([0xF8, 0xFF, 0xFE]);
 
 class Silence extends Readable {
-  _read(){
+  _read() {
     this.push(SILENCE_FRAME);
     this.destroy();
   }
@@ -58,29 +59,14 @@ client.on('message', (msg) => {
     if (!msg.member.voice.channel) {
       msg.reply('Please join a voice channel first!');
     } else {
-      const connection = joinVoiceChannel({
-        channelId: msg.member.voice.channel.id,
-        guildId: msg.guild.id,
-        adapterCreator: msg.guild.voiceAdapterCreator,
-        selfDeaf: false, 
-      });
+      const fs = require('fs');
+
+      // Create a ReadableStream of s16le PCM audio
+      const audio = connection.receiver.createStream(user, {mode: 'pcm'});
+
+      audio.pipe(fs.createWriteStream('user_audio'));
       
-      console.log(connection.playOpusPacket(SILENCE_FRAME));
       
-      connection.on('speaking', (user, speaking) => {
-        console.log(`${user.username} started speaking: ${speaking}`);
-      })
-      
-      const audioStream = connection.receiver.subscribe(msg.member);
-      // console.log(audioStream);
-      const writer = audioStream.pipe(fs.createWriteStream('./recording.pcm'));
-      // receiver.play(new Silence(), { type: 'opus'});
-      // console.log(writer);
-      // setTimeout(()=>{console.log(writer)}, 5000);
-      writer.on('finish', () => {
-        channel.leave();
-        message.channel.send('It went quiet, so I left...');
-      });
     }
   }
 

@@ -5,8 +5,7 @@
   "main": "./lib/index.js",
   "scripts": {
     "test": "node src/bot",
-    "lint": "tslint -c tslint.json src/**/*.ts",
-    "prepublish": "npm run build"
+    "lint": "tslint -c tslint.json src/**/*.ts"
   },
   "author": "",
   "license": "ISC",

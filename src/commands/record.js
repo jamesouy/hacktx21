@@ -4,6 +4,9 @@ const fs = require('fs');
 const {toneAnalyzer} = require('../analyzer');
 const {Readable} = require('stream');
 
+const {opus} = require('prism-media');
+const {pipeline} = require('stream');
+const { OpusStream } = require('prism-media/dist/opus/OpusStream');
 
 const SILENCE_FRAME = Buffer.from([0xF8, 0xFF, 0xFE]);
 class Silence extends Readable {

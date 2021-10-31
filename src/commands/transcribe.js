@@ -2,10 +2,11 @@ const {SlashCommandBuilder} = require('@discordjs/builders')
 const fs = require('fs');
 const {transcriber} = require('../speechtotext');
 const {toneAnalyzer} = require('../analyzer');
-const {threshold} = require('./threshold');
+const {threshold} = require('../slash-commands/threshold');
 const warn = require('../slash-commands/warn');
 
-
+const gifs = ['gifs/gif1.gif', 'gifs/gif2.gif', 'gifs/gif3.gif', 'gifs/gif4.gif',
+'gifs/gif5.gif', 'gifs/gif6.gif'];
 module.exports = {
   name: 'transcribe',
   execute(msg, args) {
@@ -28,17 +29,19 @@ module.exports = {
                 if (tone.score >= threshold) {
                   reply += "\nYour emotion is "+tone.tone_name+".";
                   if(tone.tone_id == 'anger') {
+                    var f = gifs[Math.floor(Math.random() * gifs.length)];
                       msg.reply({ embeds: [{
                         title: 'Warning',
-                        description: `${msg.member}, please calm down. Anger is not allowed on voice chats. Next time you will be muted.`,
-                      }]})
+                        description: `${msg.member}, we've detected that you're feeling angry. Here's a gif to cheer you up!`,
+                      }],
+                      files: [`${f}`]
+                    })
                   }
                 }
               });
               if(args.length < 2){
                 msg.reply(result + "\n" + reply);
               } else {
-                
                 msg.channel.send(msg.guild.members.cache.get(args[1]).toString() + " " + result+"\n"+reply);
               }
             })

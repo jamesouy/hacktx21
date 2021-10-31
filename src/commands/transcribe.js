@@ -2,7 +2,9 @@ const {SlashCommandBuilder} = require('@discordjs/builders')
 const fs = require('fs');
 const {transcriber} = require('../speechtotext');
 const {toneAnalyzer} = require('../analyzer');
-const {angerThreshold, joyThreshold} = require('./threshold');
+const {angerThreshold} = require('./threshold');
+const warn = require('./warn');
+
 
 module.exports = {
   name: 'transcribe',
@@ -22,10 +24,9 @@ module.exports = {
             .then(toneAnalysis => {
               let reply = JSON.stringify(toneAnalysis.result, null, 2);
               toneAnalysis.result.document_tone.tones.forEach(tone => {
-                if (tone.tone_id == "anger" && tone.score >= angerThreshold) {
-                  reply += "\nYou sound angwy.";
-                } else if (tone.tone_id == "joy" && tone.score >= joyThreshold) {
-                  reply += "\nYou sound joyous.";
+                if (tone.score >= angerThreshold) {
+                  reply += "\nYou sound "+tone.tone_name+".";
+                  if(tone.tone_id == 'angry') warn.execute(msg);
                 }
               });
               if(args.length < 2){

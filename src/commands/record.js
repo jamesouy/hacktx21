@@ -46,10 +46,7 @@ function recordUser(connection, id, msg){
     });
 
     setTimeout(()=>{
-      console.log("hiiiiiiii:)");
       opusStream.push(null);
-      // opusStream.unpipe(oggStream);
-      // opusStream.emit('close');
       opusStream.destroy();
     }, 5_000);
 }

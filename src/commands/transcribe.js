@@ -2,8 +2,8 @@ const {SlashCommandBuilder} = require('@discordjs/builders')
 const fs = require('fs');
 const {transcriber} = require('../speechtotext');
 const {toneAnalyzer} = require('../analyzer');
-const {angerThreshold} = require('./threshold');
-const warn = require('./warn');
+const {angerThreshold} = require('../slash-commands/threshold');
+const warn = require('../slash-commands/warn');
 
 
 module.exports = {

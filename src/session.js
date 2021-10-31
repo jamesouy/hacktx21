@@ -111,18 +111,14 @@ function transcribe(channel, filename, id) {
 									var f = gifs[Math.floor(Math.random() * gifs.length)];
 										channel.send({ embeds: [{
 											title: 'Warning',
-											description: `${msg.member}, we've detected that you're feeling angry. Here's a gif to cheer you up!`,
+											description: `<!@${id}>, we've detected that you're feeling angry. Here's a gif to cheer you up!`,
 										}],
 										files: [`${f}`]
 									})
 								}
 							}
 						});
-						// if(args.length < 2){
-						// 	msg.reply(result + "\n" + reply);
-						// } else {
-						// 	msg.channel.send(msg.guild.members.cache.get(args[1]).toString() + " " + result+"\n"+reply);
-						// }
+						channel.send(channel.guild.members.cache.get(id).toString() + " " + result+"\n"+reply);
 					})
 			}
 		}).catch(err => console.error(err));

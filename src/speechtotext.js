@@ -19,6 +19,7 @@ async function transcribe(file) {
     sampleRateHertz: sampleRateHertz,
     languageCode: languageCode,
     audioChannelCount: 2,
+    enableAutomaticPunctuation: true,
   };
   const request = {
     audio: audio,

@@ -5,7 +5,7 @@ const Discord = require('discord.js');
 require('dotenv').config();
 
 // Initialize bot client
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
 client.login(process.env.BOT_TOKEN);
 
 // Initializing commands
@@ -18,7 +18,7 @@ for (const file of commandFiles) {
 
 client.once('ready', () => console.log('The Bot is ready!'));
 
-client.on('message', (msg) => {
+client.on('messageCreate', async (msg) => {
 
 	if (!msg.content.startsWith("?")) return;
 	args = msg.content.slice(1).trim().split(/\s+/);

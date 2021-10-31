@@ -1,58 +1,71 @@
 const {transcriber} = require('../speechtotext');
-const {joinVoiceChannel, getVoiceConnection} = require('@discordjs/voice');
+const {joinVoiceChannel, EndBehaviorType} = require('@discordjs/voice');
 const fs = require('fs');
 const {toneAnalyzer} = require('../analyzer');
+const {Readable} = require('stream');
 
-async function connectToChannel(channel) {
-  const connection = joinVoiceChannel({
-    channelId: channel.id,
-    guildId: channel.guild.id,
-    adapterCreator: createDiscordJSAdapter(channel),
-  });
 
-  try {
-    await entersState(connection, VoiceConnectionStatus.Ready, 30e3);
-    return connection;
-  } catch (error) {
-    connection.destroy();
-    throw error;
+const SILENCE_FRAME = Buffer.from([0xF8, 0xFF, 0xFE]);
+class Silence extends Readable {
+  _read(){
+    this.push(SILENCE_FRAME);
+    this.destroy();
   }
 }
 
 module.exports = {
   name: 'record',
-  execute(msg, args) {
+  async execute(msg, args) {
     if (!msg.member.voice.channel) {
       msg.reply('Please join a voice channel first!');
     } else {
       const connection = joinVoiceChannel({
         channelId: msg.member.voice.channel.id,
-        guildId: msg.guild.id,
-        adapterCreator: msg.guild.voiceAdapterCreator,
+        guildId: msg.channel.guild.id,
+        adapterCreator: msg.channel.guild.voiceAdapterCreator,
         selfDeaf: false,
-      })
-      const receiver = connection.receiver;
-      connection.on('speaking', (user, speaking) => {
-        if (speaking) {
-          console.log(`${user.username} started speaking`);
-          msg.reply("ASD");
-          const audioStream = receiver.createStream(user, {mode: 'mp3'});
-          audioStream.on('end', () => {console.log(`${user.username} stopped speaking`);});
-          var text = transcriber(audioStream);
-          toneAnalyzer.tone(toneParams)
-            .then(toneAnalysis => {
-              let reply = JSON.stringify(toneAnalysis.result, null, 2);
-              toneAnalysis.result.document_tone.tones.forEach(tone => {
-                if (tone.tone_id == "anger" && tone.score >= angerThreshold) {
-                  reply += "\n-1 social credit";
-                } else if (tone.tone_id == "joy" && tone.score >= joyThreshold) {
-                  reply += "\n+1 social credit";
-                }
-              });
-              msg.reply(reply);
-            })
+      });
+
+      const opusStream = connection.receiver.subscribe(msg.member.id, {
+      end: {
+        behavior: EndBehaviorType.AfterSilence,
+        duration: 100,
+      },
+      });
+    
+      const oggStream = new opus.OggLogicalBitstream({
+        opusHead: new opus.OpusHead({
+          channelCount: 2,
+          sampleRate: 48000,
+        }),
+        opusTags: new opus.OpusTags({
+          maxPackets: 10,
+        }),
+      });
+    
+      const filename = `./recording.ogg`;
+    
+      const out = fs.createWriteStream(filename);
+    
+      pipeline(opusStream, oggStream, out, (err) => {
+        if (err) {
+          console.warn(`❌ Error recording file ${filename} - ${err.message}`);
+        } else {
+          console.log(`✅ Recorded ${filename}`);
         }
       });
+
+      // stream = connection.receiver.subscribe(msg.member.id, {
+      //   end: {
+      //     behavior: EndBehaviorType.AfterSilence,
+      //     duration: 100,
+      //   },
+      // }) 
+      // // writer = stream.pipe(fs.createWriteStream('./recording.pcm'));
+      // writer = stream.pipe(fs.createWriteStream('./recording.opus'));
+      // stream.on('end', () => {
+      //   console.log('end')
+      // });
     }
   }
 };

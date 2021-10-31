@@ -5,8 +5,8 @@ const fs = require('fs');
 // Creates a client
 const speechClient = new speech.SpeechClient();
 
-const encoding = 'MP3';
-const sampleRateHertz = 16000;
+const encoding = 'OGG_OPUS';
+const sampleRateHertz = 48000;
 const languageCode = 'en-US';
 
 async function transcribe(file) {
@@ -15,9 +15,10 @@ async function transcribe(file) {
   };
 
   const config = {
-    encoding: 'MP3',
-    sampleRateHertz: 16000,
-    languageCode: 'en-US',
+    encoding: encoding,
+    sampleRateHertz: sampleRateHertz,
+    languageCode: languageCode,
+    audioChannelCount: 2,
   };
   const request = {
     audio: audio,

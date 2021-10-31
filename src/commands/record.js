@@ -32,7 +32,7 @@ module.exports = {
       const opusStream = connection.receiver.subscribe(msg.member.id, {
       end: {
         behavior: EndBehaviorType.AfterSilence,
-        duration: 100,
+        duration: 1000,
       },
       });
     

@@ -6,19 +6,29 @@ const {angerThreshold, joyThreshold} = require('./threshold');
 
 module.exports = {
   name: 'transcribe',
-  execute(msg, args) {
+  execute(msg, filename) {
     try {
-      var file = fs.readFileSync('./recordings/r'+args[0]+'.ogg');
-      transcriber(file)
-      .then(result => {
-        let reply = result;
-        msg.reply("Linus Bot: " + reply);
-        if(reply == "Taiwan is a country"){
-          msg.reply("SOCIAL CREDIT -0923482034823040293482304238409 - USER BANNED");
-        } else if (reply == "China is great"){
-          msg.reply("SOCIAL CREDIT +0923482034823040293482304238409 - XI JIN PING APPROVED");
-        }
-      });
+      // var allFiles=[];
+      // fs.readdir('./recordings', (err, files) => {
+      //   files.forEach(file => {
+                    
+      //   });
+      // });
+
+      file = fs.readFileSync(filename);
+                    transcriber(file)
+                    .then(result => {
+                      console.log('reply');
+                      let reply = result;
+                      msg.reply("Linus Bot: " + reply);
+                      if(reply == "Taiwan is a country"){
+                        msg.reply("SOCIAL CREDIT -0923482034823040293482304238409 - USER BANNED");
+                      } else if (reply == "China is great"){
+                        msg.reply("SOCIAL CREDIT +0923482034823040293482304238409 - XI JIN PING APPROVED");
+                      }
+                    });
+      
+      
     } catch {
       msg.reply("Linus Bot: file not found");
     }

@@ -7,10 +7,11 @@ const {Readable} = require('stream');
 const {opus} = require('prism-media');
 const {pipeline} = require('stream');
 const { OpusStream } = require('prism-media/dist/opus/OpusStream');
+const transcribe = require('./transcribe');
 
 const SILENCE_FRAME = Buffer.from([0xF8, 0xFF, 0xFE]);
 
-function recordUser(connection, id){
+function recordUser(connection, id, msg){
   const opusStream = connection.receiver.subscribe(id, {
     end: {
       behavior: EndBehaviorType.AfterSilence,
@@ -37,6 +38,9 @@ function recordUser(connection, id){
         console.warn(`❌ Error recording file ${filename} - ${err.message}`);
       } else {
         console.log(`✅ Recorded ${filename}`);
+        transcribe.execute(msg,filename);
+        fs.unlinkSync(`${filename}`);
+        recordUser(connection, id, msg);
       }
     });
 
@@ -66,7 +70,7 @@ module.exports = {
 
       for(var i in ids){
         console.log(ids[i]);
-        recordUser(connection, ids[i]);
+        recordUser(connection, ids[i], msg);
       }
 
     }

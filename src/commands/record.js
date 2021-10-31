@@ -9,11 +9,44 @@ const {pipeline} = require('stream');
 const { OpusStream } = require('prism-media/dist/opus/OpusStream');
 
 const SILENCE_FRAME = Buffer.from([0xF8, 0xFF, 0xFE]);
-class Silence extends Readable {
-  _read(){
-    this.push(SILENCE_FRAME);
-    this.destroy();
-  }
+
+function recordUser(connection, id){
+  const opusStream = connection.receiver.subscribe(id, {
+    end: {
+      behavior: EndBehaviorType.AfterSilence,
+      duration: 2000,
+    },
+    });
+  
+    const oggStream = new opus.OggLogicalBitstream({
+      opusHead: new opus.OpusHead({
+        channelCount: 2,
+        sampleRate: 48000,
+      }),
+      opusTags: new opus.OpusTags({
+        maxPackets: 10,
+      }),
+    });
+  
+    const filename = './recordings/r'+id+'.ogg';
+  
+    const out = fs.createWriteStream(filename);
+  
+    pipeline(opusStream, oggStream, out, (err) => {
+      if (err) {
+        console.warn(`❌ Error recording file ${filename} - ${err.message}`);
+      } else {
+        console.log(`✅ Recorded ${filename}`);
+      }
+    });
+
+    setTimeout(()=>{
+      console.log("hiiiiiiii:)");
+      opusStream.push(null);
+      // opusStream.unpipe(oggStream);
+      // opusStream.emit('close');
+      opusStream.destroy();
+    }, 5_000);
 }
 
 module.exports = {
@@ -29,46 +62,13 @@ module.exports = {
         selfDeaf: false,
       });
 
-      const opusStream = connection.receiver.subscribe(msg.member.id, {
-      end: {
-        behavior: EndBehaviorType.AfterSilence,
-        duration: 1000,
-      },
-      });
-    
-      const oggStream = new opus.OggLogicalBitstream({
-        opusHead: new opus.OpusHead({
-          channelCount: 2,
-          sampleRate: 48000,
-        }),
-        opusTags: new opus.OpusTags({
-          maxPackets: 10,
-        }),
-      });
-    
-      const filename = `./recording.ogg`;
-    
-      const out = fs.createWriteStream(filename);
-    
-      pipeline(opusStream, oggStream, out, (err) => {
-        if (err) {
-          console.warn(`❌ Error recording file ${filename} - ${err.message}`);
-        } else {
-          console.log(`✅ Recorded ${filename}`);
-        }
-      });
+      const ids = Array.from(msg.member.voice.channel.members.keys());
 
-      // stream = connection.receiver.subscribe(msg.member.id, {
-      //   end: {
-      //     behavior: EndBehaviorType.AfterSilence,
-      //     duration: 100,
-      //   },
-      // }) 
-      // // writer = stream.pipe(fs.createWriteStream('./recording.pcm'));
-      // writer = stream.pipe(fs.createWriteStream('./recording.opus'));
-      // stream.on('end', () => {
-      //   console.log('end')
-      // });
+      for(var i in ids){
+        console.log(ids[i]);
+        recordUser(connection, ids[i]);
+      }
+
     }
   }
 };

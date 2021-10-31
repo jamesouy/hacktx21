@@ -5,11 +5,18 @@ const {transcriber} = require('../speechtotext');
 module.exports = {
   name: 'transcribe',
   execute(msg, args) {
-    var file = fs.readFileSync('recording.ogg');
-    transcriber(file)
-    .then(result => {
-      let reply = result;
-      msg.reply("James Bot: " + reply);
-    })
+    try {
+      var file = fs.readFileSync('./recordings/r'+args[0]+'.ogg');
+      transcriber(file)
+      .then(result => {
+        let reply = result;
+        msg.reply("Linus Bot: " + reply);
+        if(reply == "Taiwan is a country" || reply == "China is great"){
+          msg.reply("SOCIAL CREDIT -0923482034823040293482304238409 - USER BANNED");
+        }
+      });
+    } catch {
+      msg.reply("Linus Bot: file not found");
+    }
   }
 }

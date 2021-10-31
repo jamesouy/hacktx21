@@ -60,44 +60,7 @@ function commandListen(message) {
 
 client.on('message', (msg) => {
   var params = msg.content.split(" ");
-  if (params[0] === '?threshold') {
-    if (isNaN(parseFloat(params[1]))) {
-      msg.reply("Cannot convert to a number");
-    } else if (parseFloat(params[1]) < thresholdRange[0] || parseFloat(params[1]) > thresholdRange[1]) {
-      msg.reply("Threshold should be between " + thresholdRange[0] + " and " + thresholdRange[1]);
-    } else {
-      angerThreshold = parseFloat(params[1]);
-      msg.reply("Successfully set the anger threshold to " + angerThreshold);
-    }
-  }
-  else if (params[0] === '?printThreshold') {
-    msg.reply('The current anger threshold is ' + angerThreshold);
-  }
-  else if (params[0] === "?analyzeText") {
-    const toneParams = {
-      toneInput: {'text': msg.content.substring(13) || ""},
-      contentType: 'application/json',
-    };
-    toneAnalyzer.tone(toneParams)
-      .then(toneAnalysis => {
-        msg.reply(JSON.stringify(toneAnalysis.result, null, 2));
-        toneAnalysis.result.document_tone.tones.forEach(tone => {
-
-        });
-      })
-      .catch(err => {
-        console.log('error:', err);
-      });
-  } else if (params[0] === '?record') {
-    var voiceChannel = msg.member.voice.channel.id;
-    if (!voiceChannel) {
-      msg.reply('Please join a voice channel first!');
-    } else {
-      client.channels.get(voiceChannel).join();
-    }
-  } else if (params[0] === '?transcribe') {
-
-  } else if (params[0] === '?start') {
+  if (params[0] === '?start') {
     commandListen(msg);
   }
 });

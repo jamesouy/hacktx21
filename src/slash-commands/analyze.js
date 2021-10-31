@@ -1,10 +1,19 @@
+const {SlashCommandBuilder} = require('@discordjs/builders')
 const {toneAnalyzer} = require('../analyzer');
 
 module.exports = {
-  name: 'analyzeText',
-  execute(msg, args) {
+	data: new SlashCommandBuilder()
+		.setName('analyze')
+		.setDescription('Analyzes the given text for emotions')
+		.addStringOption(option => option
+			.setName('text')
+			.setDescription('The member to mute')
+			.setRequired(true)
+		),
+  async execute(interaction) {
+    text = interaction.options.getString('text')
     toneParams = {
-      toneInput: {'text': msg.content.substring(12).trim() || ""},
+      toneInput: {'text': text},
       contentType: 'application/json',
     };
     toneAnalyzer.tone(toneParams)
@@ -17,7 +26,7 @@ module.exports = {
             reply += "\nYou sound joyous.";
           }
         });
-        msg.reply(reply);
+        interaction.reply(`Analysis for "${text}"\n${reply}`);
       })
   }
 }

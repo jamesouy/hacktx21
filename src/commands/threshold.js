@@ -1,3 +1,4 @@
+const {SlashCommandBuilder} = require('@discordjs/builders')
 
 var angerThreshold = 0.6;
 var joyThreshold = 0.6;

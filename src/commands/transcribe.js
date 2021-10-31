@@ -1,3 +1,4 @@
+const {SlashCommandBuilder} = require('@discordjs/builders')
 const fs = require('fs');
 const {transcriber} = require('../speechtotext');
 const {toneAnalyzer} = require('../analyzer');

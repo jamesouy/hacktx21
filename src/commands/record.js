@@ -1,3 +1,4 @@
+const {SlashCommandBuilder} = require('@discordjs/builders')
 const {transcriber} = require('../speechtotext');
 const {joinVoiceChannel, EndBehaviorType} = require('@discordjs/voice');
 const fs = require('fs');

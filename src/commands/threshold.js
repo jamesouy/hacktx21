@@ -4,6 +4,8 @@ var joyThreshold = 0.6;
 const thresholdRange = [0, 1];
 
 module.exports = {
+  angerThreshold,
+  joyThreshold,
   name: 'threshold',
   execute(msg, args) {
     // TODO: set anger and joy threshold individually

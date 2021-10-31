@@ -118,7 +118,7 @@ function transcribe(channel, filename, id) {
 								}
 							}
 						});
-						channel.send(channel.guild.members.cache.get(id).toString() + " " + result+"\n"+reply);
+						// channel.send(channel.guild.members.cache.get(id).toString() + " " + result+"\n"+reply);
 					})
 			}
 		}).catch(err => console.error(err));

@@ -5,11 +5,16 @@ const {transcriber} = require('../speechtotext');
 module.exports = {
   name: 'transcribe',
   execute(msg, args) {
-    var file = fs.readFileSync('recording.ogg');
-    transcriber(file)
-    .then(result => {
-      let reply = result;
-      msg.reply("James Bot: " + reply);
-    })
+    try {
+      var file = fs.readFileSync(args[0]);
+      transcriber(file)
+      .then(result => {
+        let reply = result;
+        msg.reply("James Bot: " + reply);
+      })
+    } catch {
+      msg.reply("File not found");
+    }
+    
   }
 }
